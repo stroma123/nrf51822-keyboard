@@ -3,9 +3,10 @@ PROJECT_NAME := ble_app_hids_keyboard_s110_pca10028
 OUTPUT_FILENAME := ble4100
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 MAKEFILE_NAME := $(MAKEFILE_LIST)
-MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) ) 
+MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) )
 NRFSDK_DIR = ../../../sdk
 SOURCE_DIR = ../..
+TMK_DIR = ../../../tmk_core
 TEMPLATE_PATH = $(NRFSDK_DIR)/toolchain/gcc
 ifeq ($(OS),Windows_NT)
 include $(TEMPLATE_PATH)/Makefile.windows
@@ -18,7 +19,7 @@ RM := rm -rf
 
 #echo suspend
 ifeq ("$(VERBOSE)","1")
-NO_ECHO := 
+NO_ECHO :=
 else
 NO_ECHO := @
 endif
@@ -38,50 +39,80 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 #source common to all targets
 C_SOURCE_FILES += \
-$(abspath $(NRFSDK_DIR)/app_error.c) \
-$(abspath $(NRFSDK_DIR)/app_fifo.c) \
-$(abspath $(NRFSDK_DIR)/nrf_adc.c) \
-$(abspath $(NRFSDK_DIR)/app_scheduler.c) \
-$(abspath $(NRFSDK_DIR)/app_timer.c) \
-$(abspath $(NRFSDK_DIR)/app_timer_appsh.c) \
-$(abspath $(NRFSDK_DIR)/app_trace.c) \
+$(abspath $(SOURCE_DIR)/ble/main.c) \
+$(abspath $(SOURCE_DIR)/ble/battery_service.c) \
+$(abspath $(SOURCE_DIR)/ble/ble_hid_service.c) \
+$(abspath $(SOURCE_DIR)/ble/ble_services.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keyboard_led.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keyboard_matrix.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keymap_plain.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keyboard_timer.c) \
+$(abspath $(SOURCE_DIR)/keyboard/host_driver.c) \
+$(abspath $(SOURCE_DIR)/keyboard/storage.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keyboard_fn.c) \
+$(abspath $(SOURCE_DIR)/keyboard/keymap_storage.c) \
+$(abspath $(SOURCE_DIR)/keyboard/uart_driver.c) \
+\
+$(abspath $(NRFSDK_DIR)/ble_advdata.c) \
+$(abspath $(NRFSDK_DIR)/ble_advertising.c) \
+$(abspath $(NRFSDK_DIR)/ble_bas.c) \
+$(abspath $(NRFSDK_DIR)/ble_conn_params.c) \
+$(abspath $(NRFSDK_DIR)/ble_dis.c) \
+$(abspath $(NRFSDK_DIR)/ble_hids.c) \
+$(abspath $(NRFSDK_DIR)/ble_srv_common.c) \
+$(abspath $(NRFSDK_DIR)/device_manager_peripheral.c) \
 $(abspath $(NRFSDK_DIR)/bootloader_util.c) \
 $(abspath $(NRFSDK_DIR)/dfu_app_handler.c) \
-$(abspath $(NRFSDK_DIR)/nrf_assert.c) \
-$(abspath $(NRFSDK_DIR)/retarget.c) \
+$(abspath $(NRFSDK_DIR)/ble_dfu.c) \
+\
 $(abspath $(NRFSDK_DIR)/app_uart_fifo.c) \
 $(abspath $(NRFSDK_DIR)/nrf_delay.c) \
 $(abspath $(NRFSDK_DIR)/nrf_drv_common.c) \
 $(abspath $(NRFSDK_DIR)/nrf_drv_uart.c) \
 $(abspath $(NRFSDK_DIR)/pstorage.c) \
-$(abspath $(SOURCE_DIR)/main.c) \
-$(abspath $(SOURCE_DIR)/keyboard_driver.c) \
-$(abspath $(SOURCE_DIR)/battery_service.c) \
-$(abspath $(SOURCE_DIR)/led.c) \
-$(abspath $(SOURCE_DIR)/hids.c) \
-$(abspath $(NRFSDK_DIR)/ble_advdata.c) \
-$(abspath $(NRFSDK_DIR)/ble_advertising.c) \
-$(abspath $(NRFSDK_DIR)/ble_bas.c) \
-$(abspath $(NRFSDK_DIR)/ble_conn_params.c) \
-$(abspath $(NRFSDK_DIR)/ble_dfu.c) \
-$(abspath $(NRFSDK_DIR)/ble_dis.c) \
-$(abspath $(NRFSDK_DIR)/ble_hids.c) \
-$(abspath $(NRFSDK_DIR)/ble_srv_common.c) \
-$(abspath $(NRFSDK_DIR)/device_manager_peripheral.c) \
+$(abspath $(NRFSDK_DIR)/nrf_adc.c) \
+\
+$(abspath $(NRFSDK_DIR)/app_error.c) \
+$(abspath $(NRFSDK_DIR)/app_fifo.c) \
+$(abspath $(NRFSDK_DIR)/app_scheduler.c) \
+$(abspath $(NRFSDK_DIR)/app_timer.c) \
+$(abspath $(NRFSDK_DIR)/app_timer_appsh.c) \
+$(abspath $(NRFSDK_DIR)/app_trace.c) \
+$(abspath $(NRFSDK_DIR)/nrf_assert.c) \
+$(abspath $(NRFSDK_DIR)/retarget.c) \
+\
 $(abspath $(NRFSDK_DIR)/softdevice_handler.c) \
 $(abspath $(NRFSDK_DIR)/softdevice_handler_appsh.c) \
 $(abspath $(NRFSDK_DIR)/toolchain/system_nrf51.c) \
+\
+$(abspath $(TMK_DIR)/common/action.c) \
+$(abspath $(TMK_DIR)/common/action_layer.c) \
+$(abspath $(TMK_DIR)/common/action_macro.c) \
+$(abspath $(TMK_DIR)/common/action_tapping.c) \
+$(abspath $(TMK_DIR)/common/action_util.c) \
+$(abspath $(TMK_DIR)/common/debug.c) \
+$(abspath $(TMK_DIR)/common/hook.c) \
+$(abspath $(TMK_DIR)/common/host.c) \
+$(abspath $(TMK_DIR)/common/keyboard.c) \
+$(abspath $(TMK_DIR)/common/matrix.c) \
+$(abspath $(TMK_DIR)/common/print.c) \
+$(abspath $(TMK_DIR)/common/util.c) \
+$(abspath $(TMK_DIR)/common/keymap.c) \
+$(abspath $(TMK_DIR)/common/bootmagic.c) \
+
 
 #assembly files common to all targets
 ASM_SOURCE_FILES  = $(abspath $(NRFSDK_DIR)/toolchain/gcc/gcc_startup_nrf51.s)
 
 #includes common to all targets
 INC_PATHS += -I$(abspath $(SOURCE_DIR)/config)
+INC_PATHS += -I$(abspath $(SOURCE_DIR)/ble)
+INC_PATHS += -I$(abspath $(SOURCE_DIR)/keyboard)
 INC_PATHS += -I$(abspath $(SOURCE_DIR))
 INC_PATHS += -I$(abspath $(NRFSDK_DIR))
 INC_PATHS += -I$(abspath $(NRFSDK_DIR)/toolchain)
 INC_PATHS += -I$(abspath $(NRFSDK_DIR)/toolchain/gcc)
-
+INC_PATHS += -I$(abspath $(TMK_DIR)/common)
 
 OBJECT_DIRECTORY = _build
 LISTING_DIRECTORY = $(OBJECT_DIRECTORY)
@@ -91,14 +122,17 @@ OUTPUT_BINARY_DIRECTORY = $(OBJECT_DIRECTORY)
 BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LISTING_DIRECTORY) )
 
 #flags common to all targets
-CFLAGS  = -DBOARD_PCA10028
-CFLAGS += -DSOFTDEVICE_PRESENT
+#CFLAGS  = -DBOARD_PCA10028
+CFLAGS = -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF51
 CFLAGS += -DS110
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBLE_DFU_APP_SUPPORT
-CFLAGS += -DSWI_DISABLE0
-CFLAGS += -DBSP_UART_SUPPORT
+#CFLAGS += -DSWI_DISABLE0
+#CFLAGS += -DBSP_UART_SUPPORT
+CFLAGS += -D__HEAP_SIZE=512
+CFLAGS += -DBLE4100
+CFLAGS += -include config.h
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -Os
@@ -119,14 +153,15 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 
 # Assembler flags
 ASMFLAGS += -x assembler-with-cpp
-ASMFLAGS += -DBOARD_PCA10028
+#ASMFLAGS += -DBOARD_PCA10028
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF51
 ASMFLAGS += -DS110
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DSWI_DISABLE0
-ASMFLAGS += -DBSP_UART_SUPPORT
+#ASMFLAGS += -DSWI_DISABLE0
+#ASMFLAGS += -DBSP_UART_SUPPORT
 ASMFLAGS += -DBLE_DFU_APP_SUPPORT
+ASMFLAGS += -D__HEAP_SIZE=1024
 #default target - first one defined
 default: clean nrf51422_xxac_s110
 
@@ -201,7 +236,7 @@ genbin:
 	$(NO_ECHO)$(OBJCOPY) -O binary $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).bin
 
 ## Create binary .hex file from the .out file
-genhex: 
+genhex:
 	@echo Preparing: $(OUTPUT_FILENAME).hex
 	$(NO_ECHO)$(OBJCOPY) -O ihex $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
 
