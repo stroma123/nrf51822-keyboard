@@ -4,7 +4,9 @@ else
 	PROGFILES := C:/Program Files (x86)
 endif
 
-GNU_INSTALL_ROOT := C:/Program Files (x86)/GNU Tools ARM Embedded/4.9 2015q3
-GNU_VERSION := 4.9.3
+# GNU_INSTALL_ROOT := D:/nRF51822/gcc-arm-none-eabi-5_2-2015q4-20151219-win32
+GNU_INSTALL_ROOT := D:/nRF51822/gcc-arm-none-eabi-6-2017-q1-update-win32
+# GNU_VERSION := 5.2.1
+GNU_VERSION := 6.3.1
 GNU_PREFIX := arm-none-eabi
 

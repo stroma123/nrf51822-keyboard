@@ -64,3 +64,4 @@ EventRecorderStub.scvd
 
 
 # End of https://www.gitignore.io/api/keil
+/main/project/arm5_no_packs/ble_app_hids_keyboard_s110_pca10028.uvoptx
