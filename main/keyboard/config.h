@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KEYBOARD_4100
 #elif BLE60
 #define KEYBOARD_60
+#elif BLE400
+#define KEYBOARD_400
 #else
 #error PLEASE SPECIFIC ONE KEYBOARD, BLE4100 or BLE60
 #endif
@@ -58,6 +60,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #define KEYBOARD_REVA
     
     #define UART_SUPPORT
+
+#endif
+
+#ifdef KEYBOARD_400
+
+    #define PRODUCT         "BLE400"
+
+    /* key matrix size */
+    #define MATRIX_ROWS 4
+    #define MATRIX_COLS 4
+
+    /* define if matrix has ghost */
+    #define MATRIX_HAS_GHOST
+
+   // #define UART_SUPPORT
 
 #endif
 

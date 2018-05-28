@@ -75,3 +75,21 @@ const action_t PROGMEM fn_actions[] = {
 
 #endif
 
+#ifdef KEYBOARD_400
+const uint8_t keymaps[2][MATRIX_ROWS][MATRIX_COLS] = {
+    /* 0: qwerty */
+    KEYMAP( \
+           ESC,  F1, F2,  F3, \
+           1,    2,   3,   4, \
+           TAB,  Q,   W,   E, \
+           CAPS, A,   S,   D  ) ,
+    /* 1: Fn */       
+    KEYMAP( \
+         TRNS, F11, F12,TRNS, \
+         TRNS,TRNS,TRNS,TRNS, \
+         TRNS,TRNS,TRNS,TRNS, \
+         TRNS,TRNS,TRNS,TRNS  ) ,       
+};
+
+const action_t PROGMEM fn_actions[] = {ACTION_LAYER_MOMENTARY(1), ACTION_FUNCTION(POWER_SLEEP)};
+#endif

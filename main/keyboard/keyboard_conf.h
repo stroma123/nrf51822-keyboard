@@ -65,6 +65,47 @@ static const uint8_t row_pin_array[MATRIX_ROWS] = {24,25,26,27,28};
 
 #endif
 
+#ifdef KEYBOARD_400
+
+#define KEY1	16
+#define KEY2	17
+
+#define LED0	18
+#define LED1	19
+#define LED2	20
+#define LED3	21
+#define LED4	22
+
+#define UART_TXD 9
+#define UART_RXD 11
+//#define UART_RXD 5
+//#define UART_TXD 6
+
+/** 电量测量引脚 */
+#define KEYBOARD_ADC NRF_ADC_CONFIG_INPUT_2
+
+/** 数字锁定灯IO口 */
+#define LED_NUM	LED0
+/** 大小写锁定灯IO口 */
+#define LED_CAPS LED2
+/** 滚动锁定IO口 */
+#define LED_SCLK LED4
+
+/** 行IO */
+static const uint8_t row_pin_array[MATRIX_ROWS] = {23,24,25,26};
+/** 列IO */
+static const uint8_t column_pin_array[MATRIX_COLS] = {12,13,14,15};
+
+/** Bootloader强制进入引脚 */
+#define BOOTLOADER_BUTTON KEY1
+
+#define UPDATE_IN_PROGRESS_LED      LED_NUM
+#define ADVERTISING_LED_PIN_NO      LED_CAPS
+#define CONNECTED_LED_PIN_NO        LED_SCLK
+#define LED_POSITIVE
+
+#endif
+
 #ifdef LED_POSITIVE
     #define LED_SET(x) nrf_gpio_pin_set(x)
     #define LED_CLEAR(x) nrf_gpio_pin_clear(x)
