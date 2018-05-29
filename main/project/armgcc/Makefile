@@ -1,7 +1,11 @@
 PROJECT_NAME := ble_app_hids_keyboard_s110_pca10028
 
-OUTPUT_FILENAME := ble4100
+#OUTPUT_FILENAME := ble4100
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+
+OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
+OPENOCD_EXECUTABLE := openocd.exe
+
 MAKEFILE_NAME := $(MAKEFILE_LIST)
 MAKEFILE_DIR := $(dir $(MAKEFILE_NAME) )
 NRFSDK_DIR = ../../../sdk
@@ -130,8 +134,8 @@ CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBLE_DFU_APP_SUPPORT
 #CFLAGS += -DSWI_DISABLE0
 #CFLAGS += -DBSP_UART_SUPPORT
-CFLAGS += -D__HEAP_SIZE=512
-CFLAGS += -DBLE4100
+CFLAGS += -D__HEAP_SIZE=1024
+#CFLAGS += -DBLE4100
 CFLAGS += -include config.h
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
@@ -163,17 +167,17 @@ ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 ASMFLAGS += -DBLE_DFU_APP_SUPPORT
 ASMFLAGS += -D__HEAP_SIZE=1024
 #default target - first one defined
-default: clean nrf51422_xxac_s110
+default: clean ble4100_xxaa_dfu_s110
 
 #building all targets
 all: clean
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e cleanobj
-	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e nrf51422_xxac_s110
+	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e ble4100_xxaa_dfu_s110
 
 #target for printing all targets
 help:
 	@echo following targets are available:
-	@echo 	nrf51422_xxac_s110
+	@echo 	ble4100_xxaa_dfu_s110
 	@echo 	flash_softdevice
 
 
@@ -190,12 +194,14 @@ vpath %.s $(ASM_PATHS)
 
 OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
 
-nrf51422_xxac_s110: OUTPUT_FILENAME := ble4100
-nrf51422_xxac_s110: LINKER_SCRIPT=ble_app_hids_keyboard_gcc_nrf51.ld
-nrf51422_xxac_s110: $(BUILD_DIRECTORIES) $(OBJECTS)
+ble4100_xxaa_dfu_s110: CFLAGS += -DBLE400
+ble4100_xxaa_dfu_s110: $(eval OUTPUT_FILENAME = ble4100_dfu_s110)
+ble4100_xxaa_dfu_s110: LINKER_SCRIPT = ble_app_hids_keyboard_gcc_nrf51.ld
+ble4100_xxaa_dfu_s110: $(BUILD_DIRECTORIES) $(OBJECTS)
 	@echo Linking target: $(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e finalize
+
 
 ## Create build directories
 $(BUILD_DIRECTORIES):
@@ -253,11 +259,20 @@ cleanobj:
 
 flash: $(MAKECMDGOALS)
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	nrfjprog --program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex -f nrf51  --sectorerase
-	nrfjprog --reset
+
+flash_hex:
+	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
 
 ## Flash softdevice
 flash_softdevice:
 	@echo Flashing: s110_nrf51_8.0.0_softdevice.hex
-	nrfjprog --program $(NRFSDK_DIR)/s110_nrf51_8.0.0_softdevice.hex -f nrf51 --chiperase
-	nrfjprog --reset
+#	nrfjprog --program $(NRFSDK_DIR)/s110_nrf51_8.0.0_softdevice.hex -f nrf51 --chiperase
+#	nrfjprog --reset
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../sdk/s110_nrf51_8.0.0_softdevice.hex verify reset exit"
+
+flash_ble4100: OUTPUT_FILENAME = ble4100_dfu_s110
+flash_ble4100: flash_hex
+
+flash_ble400: OUTPUT_FILENAME = ble400_dfu_s110
+flash_ble400: flash_hex
