@@ -15,7 +15,7 @@ EventRecorderStub.scvd
 # *.bat  # generate batch file
 # output/project_name # uv project generate without file ext
 # *.SRC # generate source file
-# *.src 
+# *.src
 
 # Prerequisites
 *.d
@@ -65,3 +65,4 @@ EventRecorderStub.scvd
 
 # End of https://www.gitignore.io/api/keil
 /main/project/arm5_no_packs/ble_app_hids_keyboard_s110_pca10028.uvoptx
+.settings
