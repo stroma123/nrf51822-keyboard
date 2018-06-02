@@ -134,7 +134,7 @@ static void services_init(void)
 
 /**
  * @brief 处理配对码输入
- * 
+ *
  * @param key_packet 按键报文
  * @param key_packet_size 报文长度
  */
@@ -167,7 +167,7 @@ void keyboard_conn_pass_enter_handler(uint8_t *key_packet, uint8_t key_packet_si
 
 /**
  * @brief 切换扫描模式
- * 
+ *
  * @param slow 切换至慢速扫描
  */
 static void keyboard_switch_scan_mode(bool slow)
@@ -184,8 +184,8 @@ static void keyboard_switch_scan_mode(bool slow)
 
 /**
  * @brief 键盘睡眠定时器
- * 
- * @param p_context 
+ *
+ * @param p_context
  */
 static void keyboard_sleep_timeout_handler(void *p_context)
 {
@@ -201,7 +201,7 @@ static void keyboard_sleep_timeout_handler(void *p_context)
 }
 /**
  * @brief 重置键盘睡眠定时器
- * 
+ *
  */
 static void keyboard_sleep_counter_reset(void)
 {
@@ -225,8 +225,8 @@ static void keyboard_scan_timeout_handler(void *p_context)
 }
 /**
  * @brief 键盘按键按下的Hook
- * 
- * @param event 
+ *
+ * @param event
  */
 void hook_matrix_change(keyevent_t event)
 {
@@ -234,7 +234,7 @@ void hook_matrix_change(keyevent_t event)
 }
 /**
  * @brief 发送按键报文的Hook
- * 
+ *
  * @param report 按键报文
  */
 void hook_send_keyboard(report_keyboard_t * report)
@@ -244,7 +244,7 @@ void hook_send_keyboard(report_keyboard_t * report)
 
 /**
  * @brief BootMagic的Hook
- * 
+ *
  */
 void hook_bootmagic()
 {
@@ -287,7 +287,7 @@ static void timers_start(void)
 /**@brief Function for putting the chip into sleep mode.
  *
  * @note This function will not return.
- * 
+ *
  * @param[in]   notice   Flash led to notice or not.
  */
 void sleep_mode_enter(bool notice)
@@ -299,6 +299,9 @@ void sleep_mode_enter(bool notice)
     matrix_sleep_prepare();
 #ifdef UART_SUPPORT
     uart_sleep_prepare();
+#elif defined(UART_DEBUG_PRINT)
+    extern uint32_t app_uart_close(void);
+    app_uart_close();
 #endif
 
     // Go to system-off mode (this function will not return; wakeup will cause a reset).
@@ -346,7 +349,12 @@ static void ble_stack_init(void)
     uint32_t err_code;
 
     // Initialize the SoftDevice handler module.
+#ifndef KEYBOARD_400
     SOFTDEVICE_HANDLER_APPSH_INIT(NRF_CLOCK_LFCLKSRC_RC_250_PPM_250MS_CALIBRATION, true);
+#else
+    // Core51822 has 32kHz crystal on board
+    SOFTDEVICE_HANDLER_APPSH_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, true);
+#endif
 
     // Enable BLE stack
     ble_enable_params_t ble_enable_params;
@@ -399,7 +407,7 @@ void uart_state_change(bool state)
     uint32_t err_code;
     if(state)
     {
-        
+
         err_code = app_timer_stop(m_keyboard_sleep_timer_id);
         APP_ERROR_CHECK(err_code);
         led_powersave_mode(false);
@@ -413,33 +421,90 @@ void uart_state_change(bool state)
     }
 }
 
+#elif defined(UART_DEBUG_PRINT)
+
+#include "debug.h"
+//#include "xprintf.h"
+#include "keyboard_conf.h"
+#include "app_util_platform.h"
+#include "app_uart.h"
+
+#define TX_PIN_NUMBER UART_TXD
+#define RX_PIN_NUMBER UART_RXD
+#define RTS_PIN_NUMBER 0
+#define CTS_PIN_NUMBER 0
+
+#define UART_TX_BUF_SIZE 256                         /**< UART TX buffer size. */
+#define UART_RX_BUF_SIZE 1                           /**< UART RX buffer size. */
+
+void uart_error_handle(app_uart_evt_t * p_event)
+{
+    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_communication);
+    }
+    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_code);
+    }
+}
 #endif
 /**@brief Function for application main entry.
  */
 int main(void)
 {
     uint32_t err_code;
-    
+
     // Initialize.
     // app_trace_init();
     timers_init();
     buttons_leds_init();
     ble_stack_init();
     scheduler_init();
-    
+
     sd_power_dcdc_mode_set(true);
-    
+
     // Initialize persistent storage module before the keyboard.
     err_code = pstorage_init();
     APP_ERROR_CHECK(err_code);
-    
+
     keymap_init();
 #ifdef UART_SUPPORT
     uart_set_evt_handler(&uart_state_change);
     uart_init();
+#elif defined(UART_DEBUG_PRINT)
+
+    const app_uart_comm_params_t comm_params =
+      {
+          RX_PIN_NUMBER,
+          TX_PIN_NUMBER,
+          RTS_PIN_NUMBER,
+          CTS_PIN_NUMBER,
+          APP_UART_FLOW_CONTROL_DISABLED,
+          false,
+          UART_BAUDRATE_BAUDRATE_Baud38400
+      };
+
+    APP_UART_FIFO_INIT(&comm_params,
+                         UART_RX_BUF_SIZE,
+                         UART_TX_BUF_SIZE,
+                         uart_error_handle,
+                         APP_IRQ_PRIORITY_LOW,
+                         err_code);
+
+    APP_ERROR_CHECK(err_code);
+    xdev_out(putc);
+    xprintf("uart debug enabled\n");
 #endif
-	keyboard_init();
+
+    keyboard_init();
     services_init();
+
+#ifdef UART_DEBUG_PRINT
+    debug_config.enable = true; // force debug pring
+    //debug_config.matrix = true; // force matrix debug
+    debug_config.keyboard = true; // force keyboard report debug
+#endif
 
     // set driver after all module inited.
     host_set_driver(&driver);
@@ -447,14 +512,14 @@ int main(void)
     timers_start();
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-    
+
     led_change_handler(0x01, true);
     led_notice(0x07, 0x00);
-    
+
 #ifdef UART_SUPPORT
     uart_state_change(uart_enable);
 #endif
-    
+
     // Enter main loop.
     for (;;)
     {

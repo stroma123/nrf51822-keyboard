@@ -55,16 +55,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     /* key matrix size */
     #define MATRIX_ROWS 5
     #define MATRIX_COLS 14
-    
+
     //#define KEYBOARD_DEBUG
     #define KEYBOARD_REVA
-    
+
     #define UART_SUPPORT
 
 #endif
 
 #ifdef KEYBOARD_400
-
+/*
+  Quick evaluation setup based on Core51822/BLE400 boards
+  and 3x4 phone keypad
+*/
     #define PRODUCT         "BLE400"
 
     /* key matrix size */
@@ -74,7 +77,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     /* define if matrix has ghost */
     #define MATRIX_HAS_GHOST
 
-   // #define UART_SUPPORT
+    // #define UART_SUPPORT
+    #define UART_DEBUG_PRINT
+    #define KEYBOARD_DEBUG
 
 #endif
 
@@ -111,7 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_DEBUG
 
 /* disable print */
-#define NO_PRINT
+//#define NO_PRINT
 
 /* disable action features */
 //#define NO_ACTION_LAYER
@@ -121,7 +126,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_FUNCTION
 
 #define BOOTMAGIC_ENABLE
-#define EXTRAKEY_ENABLE 
+#define EXTRAKEY_ENABLE
 
 /* fix led state on android */
 #define LED_STATE_FIX

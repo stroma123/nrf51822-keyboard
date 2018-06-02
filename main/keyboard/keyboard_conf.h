@@ -54,7 +54,7 @@ static const uint8_t row_pin_array[MATRIX_ROWS] = {24,25,26,27,28};
 
 /**
  * @brief 此版本中有一个硬件设计错误，导致ADC电量测量无法使用。这里将其关闭。
- * 
+ *
  */
 #ifdef KEYBOARD_REVA
     static const uint8_t column_pin_array[MATRIX_COLS] = {19,17,15,13,11,9,7,6,5,4,3,2,1,0};
@@ -92,9 +92,9 @@ static const uint8_t row_pin_array[MATRIX_ROWS] = {24,25,26,27,28};
 #define LED_SCLK LED4
 
 /** 行IO */
-static const uint8_t row_pin_array[MATRIX_ROWS] = {23,24,25,26};
+static const uint8_t row_pin_array[MATRIX_ROWS] = {0,29,25,23};
 /** 列IO */
-static const uint8_t column_pin_array[MATRIX_COLS] = {12,13,14,15};
+static const uint8_t column_pin_array[MATRIX_COLS] = {30,28,24,6};
 
 /** Bootloader强制进入引脚 */
 #define BOOTLOADER_BUTTON KEY1

@@ -600,6 +600,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\keyboard\uart_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>xprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\keyboard\xprintf.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3235,6 +3240,11 @@
               <FileName>uart_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\keyboard\uart_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>xprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\keyboard\xprintf.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6298,6 +6308,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\keyboard\uart_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>xprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\keyboard\xprintf.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8716,6 +8731,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\keyboard\uart_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>xprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\keyboard\xprintf.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10483,7 +10503,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -10656,7 +10676,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -10680,7 +10700,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--gnu --preinclude=config.h</MiscControls>
-              <Define>BLE_STACK_SUPPORT_REQD SOFTDEVICE_PRESENT S110 NRF51 BLE_DFU_APP_SUPPORT BLE400</Define>
+              <Define>DEBUG BLE_STACK_SUPPORT_REQD SOFTDEVICE_PRESENT S110 NRF51 BLE_DFU_APP_SUPPORT BLE400</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\config;..\..\..\sdk;..\..\..\tmk_core\common;..\..\ble\;..\..\keyboard\</IncludePath>
             </VariousControls>
@@ -10943,6 +10963,11 @@
               <FileName>uart_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\keyboard\uart_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>xprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\keyboard\xprintf.c</FilePath>
             </File>
           </Files>
         </Group>

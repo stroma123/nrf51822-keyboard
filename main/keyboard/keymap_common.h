@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * 键盘矩阵基配置文件
- * 
+ *
  * 定义各个按键的位置，方便编写Keymap
  */
 #ifndef KEYMAP_COMMON_H
@@ -110,14 +110,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define KEYMAP( \
     K00, K01, K02, K03,\
-    K11, K12, K13, K14,\
+    K10, K11, K12, K13,\
     K20, K21, K22, K23,\
     K30, K31, K32, K33 \
 ) { \
-    {KC_##K00, KC_##K11, KC_##K20, KC_##K30},\
-    {KC_##K01, KC_##K12, KC_##K21, KC_##K31},\
-    {KC_##K02, KC_##K13, KC_##K22, KC_##K32},\
-    {KC_##K03, KC_##K14, KC_##K23, KC_##K33}\
+    {KC_##K00, KC_##K01, KC_##K02, KC_##K03},\
+    {KC_##K10, KC_##K11, KC_##K12, KC_##K13},\
+    {KC_##K20, KC_##K21, KC_##K22, KC_##K23},\
+    {KC_##K30, KC_##K31, KC_##K32, KC_##K33} \
 }
 
 #endif
