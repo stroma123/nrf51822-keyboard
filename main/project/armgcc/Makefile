@@ -3,7 +3,8 @@ PROJECT_NAME := ble_app_hids_keyboard_s110_pca10028
 #OUTPUT_FILENAME := ble4100
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
-OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
+#OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
+OPENOCD_PATH       := D:/Program Files/GNU ARM Eclipse/OpenOCD/0.10.0-201701241841/bin
 OPENOCD_EXECUTABLE := openocd.exe
 
 MAKEFILE_NAME := $(MAKEFILE_LIST)
@@ -56,6 +57,7 @@ $(abspath $(SOURCE_DIR)/keyboard/storage.c) \
 $(abspath $(SOURCE_DIR)/keyboard/keyboard_fn.c) \
 $(abspath $(SOURCE_DIR)/keyboard/keymap_storage.c) \
 $(abspath $(SOURCE_DIR)/keyboard/uart_driver.c) \
+$(abspath $(SOURCE_DIR)/keyboard/xprintf.c) \
 \
 $(abspath $(NRFSDK_DIR)/ble_advdata.c) \
 $(abspath $(NRFSDK_DIR)/ble_advertising.c) \
@@ -126,20 +128,19 @@ OUTPUT_BINARY_DIRECTORY = $(OBJECT_DIRECTORY)
 BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LISTING_DIRECTORY) )
 
 #flags common to all targets
-#CFLAGS  = -DBOARD_PCA10028
-CFLAGS = -DSOFTDEVICE_PRESENT
+CFLAGS  = -DBOARD_CUSTOM
+CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF51
 CFLAGS += -DS110
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBLE_DFU_APP_SUPPORT
 #CFLAGS += -DSWI_DISABLE0
 #CFLAGS += -DBSP_UART_SUPPORT
-CFLAGS += -D__HEAP_SIZE=1024
-#CFLAGS += -DBLE4100
+CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -include config.h
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
-CFLAGS += -Wall -Werror -Os
+CFLAGS += -Wall -Werror -O1
 CFLAGS += -mfloat-abi=soft
 # keep every function in separate section. This will allow linker to dump unused functions
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
@@ -157,7 +158,7 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 
 # Assembler flags
 ASMFLAGS += -x assembler-with-cpp
-#ASMFLAGS += -DBOARD_PCA10028
+ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF51
 ASMFLAGS += -DS110
@@ -165,21 +166,22 @@ ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 #ASMFLAGS += -DSWI_DISABLE0
 #ASMFLAGS += -DBSP_UART_SUPPORT
 ASMFLAGS += -DBLE_DFU_APP_SUPPORT
-ASMFLAGS += -D__HEAP_SIZE=1024
+ASMFLAGS += -D__HEAP_SIZE=0
 #default target - first one defined
-default: clean ble4100_xxaa_dfu_s110
+default: clean ble400
 
 #building all targets
 all: clean
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e cleanobj
-	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e ble4100_xxaa_dfu_s110
+	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e ble4100
+	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e ble400
 
 #target for printing all targets
 help:
 	@echo following targets are available:
-	@echo 	ble4100_xxaa_dfu_s110
+	@echo 	ble4100
+	@echo 	ble400
 	@echo 	flash_softdevice
-
 
 C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
 C_PATHS = $(call remduplicates, $(dir $(C_SOURCE_FILES) ) )
@@ -194,14 +196,19 @@ vpath %.s $(ASM_PATHS)
 
 OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
 
-ble4100_xxaa_dfu_s110: CFLAGS += -DBLE400
-ble4100_xxaa_dfu_s110: $(eval OUTPUT_FILENAME = ble4100_dfu_s110)
-ble4100_xxaa_dfu_s110: LINKER_SCRIPT = ble_app_hids_keyboard_gcc_nrf51.ld
-ble4100_xxaa_dfu_s110: $(BUILD_DIRECTORIES) $(OBJECTS)
+ble4100: CFLAGS += -DBLE4100
+ble4100: OUTPUT_FILENAME = ble4100_dfu_s110
+ble4100: ble_xx finalize
+
+ble400: CFLAGS += -DBLE400
+ble400: OUTPUT_FILENAME = ble400_dfu_s110
+ble400: ble_xx finalize
+
+ble_xx: LINKER_SCRIPT = ble_app_hids_keyboard_gcc_nrf51.ld
+ble_xx: $(BUILD_DIRECTORIES) $(OBJECTS)
 	@echo Linking target: $(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
-	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e finalize
-
+#	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e finalize
 
 ## Create build directories
 $(BUILD_DIRECTORIES):
@@ -262,6 +269,7 @@ flash: $(MAKECMDGOALS)
 
 flash_hex:
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	@echo "$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
 	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
 
 ## Flash softdevice
