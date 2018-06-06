@@ -50,4 +50,5 @@ SECTIONS
   /* other placements follow here... */
 }
 
-INCLUDE "nrf5x_common.ld"
+/* INCLUDE "nrf5x_common.ld" */
+INCLUDE "gcc_nrf51_common.ld"
