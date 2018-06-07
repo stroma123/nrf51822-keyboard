@@ -1,5 +1,9 @@
 PROJECT_NAME := dfu_dual_bank_ble_s110_pca10028
 
+OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
+#OPENOCD_PATH       := D:/Program Files/GNU ARM Eclipse/OpenOCD/0.10.0-201701241841/bin
+OPENOCD_EXECUTABLE := openocd.exe
+
 export OUTPUT_FILENAME
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 MAKEFILE_NAME := $(MAKEFILE_LIST)
@@ -97,6 +101,8 @@ CFLAGS += -DBLE4100
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -Os
+#use link time optimization
+CFLAGS += -flto
 CFLAGS += -mfloat-abi=soft
 # keep every function in separate section. This will allow linker to dump unused functions
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
@@ -215,4 +221,19 @@ flash: $(MAKECMDGOALS)
 	nrfjprog --program $(OUTPUT_BINARY_DIRECTORY)/$<.hex -f nrf51  --chiperase
 	nrfjprog --reset
 
+flash_hex:
+	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
+
+flash_erase:
+	@echo Mass erase all flash!
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c "nrf51 mass_erase" -c exit
+
 ## Flash softdevice
+flash_softdevice:
+	@echo Flashing: s110_softdevice.hex
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../sdk/s110_nrf51_8.0.0_softdevice.hex verify reset exit"
+
+flash_dfu: OUTPUT_FILENAME = nrf51422_xxac
+flash_dfu: flash_erase flash_hex flash_softdevice
+
