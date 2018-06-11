@@ -3,8 +3,7 @@ PROJECT_NAME := ble_app_hids_keyboard_s110_pca10028
 #OUTPUT_FILENAME := ble4100
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
-#OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
-OPENOCD_PATH       := D:/Program Files/GNU ARM Eclipse/OpenOCD/0.10.0-201701241841/bin
+OPENOCD_PATH       ?= D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
 OPENOCD_EXECUTABLE := openocd.exe
 
 MAKEFILE_NAME := $(MAKEFILE_LIST)
@@ -130,22 +129,22 @@ BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LIS
 #flags common to all targets
 CFLAGS  = -DBOARD_CUSTOM
 CFLAGS += -DSOFTDEVICE_PRESENT
-CFLAGS += -DNRF51
+CFLAGS += -DSWI_DISABLE0
 CFLAGS += -DS110
+CFLAGS += -DNRF51
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBLE_DFU_APP_SUPPORT
-#CFLAGS += -DSWI_DISABLE0
-#CFLAGS += -DBSP_UART_SUPPORT
-CFLAGS += -D__HEAP_SIZE=0
-CFLAGS += -include config.h
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
-CFLAGS += -Wall -Werror -O1
+#CFLAGS += -Wall -Werror -O3
+CFLAGS += -Os
 CFLAGS += -mfloat-abi=soft
+CFLAGS += -D__HEAP_SIZE=0
+CFLAGS += -include config.h
 # keep every function in separate section. This will allow linker to dump unused functions
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
-CFLAGS += -g
+#CFLAGS += -g
 
 # keep every function in separate section. This will allow linker to dump unused functions
 LDFLAGS += -Xlinker -Map=$(LISTING_DIRECTORY)/$(OUTPUT_FILENAME).map
@@ -160,11 +159,10 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DBOARD_CUSTOM
 ASMFLAGS += -DSOFTDEVICE_PRESENT
-ASMFLAGS += -DNRF51
+ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DS110
+ASMFLAGS += -DNRF51
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-#ASMFLAGS += -DSWI_DISABLE0
-#ASMFLAGS += -DBSP_UART_SUPPORT
 ASMFLAGS += -DBLE_DFU_APP_SUPPORT
 ASMFLAGS += -D__HEAP_SIZE=0
 #default target - first one defined
@@ -181,7 +179,9 @@ help:
 	@echo following targets are available:
 	@echo 	ble4100
 	@echo 	ble400
+	@echo 	flash_erase
 	@echo 	flash_softdevice
+	@echo 	reset_target
 
 C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
 C_PATHS = $(call remduplicates, $(dir $(C_SOURCE_FILES) ) )
@@ -269,15 +269,20 @@ flash: $(MAKECMDGOALS)
 
 flash_hex:
 	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex
-	@echo "$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
 	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).hex verify reset exit"
+
+flash_erase:
+	@echo Mass erase all flash!
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c "nrf51 mass_erase" -c exit
 
 ## Flash softdevice
 flash_softdevice:
 	@echo Flashing: s110_nrf51_8.0.0_softdevice.hex
-#	nrfjprog --program $(NRFSDK_DIR)/s110_nrf51_8.0.0_softdevice.hex -f nrf51 --chiperase
-#	nrfjprog --reset
 	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../sdk/s110_nrf51_8.0.0_softdevice.hex verify reset exit"
+
+reset_target:
+	@echo Resetting...
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset run" -c exit
 
 flash_ble4100: OUTPUT_FILENAME = ble4100_dfu_s110
 flash_ble4100: flash_hex

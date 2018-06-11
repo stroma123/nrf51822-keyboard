@@ -1,7 +1,6 @@
 PROJECT_NAME := dfu_dual_bank_ble_s110_pca10028
 
-OPENOCD_PATH       := D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
-#OPENOCD_PATH       := D:/Program Files/GNU ARM Eclipse/OpenOCD/0.10.0-201701241841/bin
+OPENOCD_PATH       ?= D:/nrf51822/OpenOCD/0.10.0-201601101000-dev/bin
 OPENOCD_EXECUTABLE := openocd.exe
 
 export OUTPUT_FILENAME
@@ -140,6 +139,10 @@ all: clean
 help:
 	@echo following targets are available:
 	@echo 	nrf51422_xxac
+	@echo 	flash_erase
+	@echo 	flash_softdevice
+	@echo 	flash_dfu
+	@echo 	reset_target
 
 
 C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
@@ -233,6 +236,10 @@ flash_erase:
 flash_softdevice:
 	@echo Flashing: s110_softdevice.hex
 	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../sdk/s110_nrf51_8.0.0_softdevice.hex verify reset exit"
+
+reset_target:
+	@echo Resetting...
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset run" -c exit
 
 flash_dfu: OUTPUT_FILENAME = nrf51422_xxac
 flash_dfu: flash_erase flash_hex flash_softdevice

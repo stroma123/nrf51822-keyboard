@@ -32,6 +32,7 @@
 #include "app_scheduler.h"
 #include "app_timer_appsh.h"
 #include "pstorage.h"
+#include "app_trace.h"
 
 #include "ble_services.h"
 #include "battery_service.h"
@@ -456,13 +457,19 @@ int main(void)
     uint32_t err_code;
 
     // Initialize.
-    // app_trace_init();
+    app_trace_init();
+    app_trace_log("Trace log\r\n");
+
     timers_init();
     buttons_leds_init();
     ble_stack_init();
     scheduler_init();
 
-    sd_power_dcdc_mode_set(true);
+#ifndef KEYBOARD_400
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+#else
+    sd_power_dcdc_mode_set(NRF_POWER_DCDC_DISABLE);
+#endif
 
     // Initialize persistent storage module before the keyboard.
     err_code = pstorage_init();
@@ -493,8 +500,9 @@ int main(void)
                          err_code);
 
     APP_ERROR_CHECK(err_code);
-    xdev_out(putc);
-    xprintf("uart debug enabled\n");
+
+    xdev_out(putchar);
+    xprintf("UART debug enabled\n");
 #endif
 
     keyboard_init();

@@ -80,6 +80,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     // #define UART_SUPPORT
     #define UART_DEBUG_PRINT
     #define KEYBOARD_DEBUG
+    // #define ENABLE_DEBUG_LOG_SUPPORT
 
 #endif
 
