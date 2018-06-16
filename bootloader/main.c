@@ -96,8 +96,13 @@ static void timers_init(void)
  */
 static void buttons_init(void)
 {
+#ifndef KEYBOARD_400
     nrf_gpio_cfg_input(BOOTLOADER_BUTTON,
                              NRF_GPIO_PIN_PULLDOWN);
+#else
+    nrf_gpio_cfg_input(BOOTLOADER_BUTTON,
+                             NRF_GPIO_PIN_PULLUP);
+#endif
     // nrf_gpio_cfg_output(BOOTLOADER_BTN_OPT);
     // nrf_gpio_pin_set(BOOTLOADER_BTN_OPT);
 }
@@ -214,7 +219,11 @@ int main(void)
     }
 
     dfu_start  = app_reset;
+#ifndef KEYBOARD_400
     dfu_start |= (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 1);
+#else
+    dfu_start |= (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0);
+#endif
 
     if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
     {
