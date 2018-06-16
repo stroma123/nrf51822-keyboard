@@ -289,3 +289,19 @@ flash_ble4100: flash_hex
 
 flash_ble400: OUTPUT_FILENAME = ble400_dfu_s110
 flash_ble400: flash_hex
+
+flash_dfu:
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../bootloader/project/armgcc/_build/nrf51422_xxac.hex verify reset exit"
+
+flash_dfu_keil:
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../../../bootloader/project/arm5_no_packs/_build/ble400.hex verify reset exit"
+
+flash_ble400_keil:
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program ../arm5_no_packs/_build/ble400.hex verify reset exit"
+
+flash_dfu_sdk10:
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program nrf51822_xxaa_dfu_bl.hex verify reset exit"
+
+flash_hrs_sdk10:
+	"$(OPENOCD_PATH)/$(OPENOCD_EXECUTABLE)" -f board/nrf51x22.cfg -c init -c "reset init" -c halt -c "program nrf51822_xxaa_hrs_dfu_s110.hex verify reset exit"
+

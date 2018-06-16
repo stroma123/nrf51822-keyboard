@@ -96,7 +96,7 @@ CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -D__STACK_SIZE=2048
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBSP_DEFINES_ONLY
-CFLAGS += -DBLE4100
+CFLAGS += -DBLE400
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -Os
