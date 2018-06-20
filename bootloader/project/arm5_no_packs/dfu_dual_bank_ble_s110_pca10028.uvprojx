@@ -2186,7 +2186,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>BLE_STACK_SUPPORT_REQD __HEAP_SIZE=0 BOARD_PCA10028 S110 BSP_DEFINES_ONLY NRF51 SOFTDEVICE_PRESENT SWI_DISABLE0 BLE400</Define>
+              <Define>BLE_STACK_SUPPORT_REQD __HEAP_SIZE=0 BOARD_CUSTOM S110 BSP_DEFINES_ONLY NRF51 SOFTDEVICE_PRESENT SWI_DISABLE0 BLE400</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\config;..\..\..\sdk;..\..\..\main\keyboard</IncludePath>
             </VariousControls>
