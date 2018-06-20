@@ -10639,7 +10639,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x18000</StartAddress>
-                <Size>0x28000</Size>
+                <Size>0x12000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -10676,7 +10676,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -10700,7 +10700,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--gnu --preinclude=config.h</MiscControls>
-              <Define>DEBUG BLE_STACK_SUPPORT_REQD SOFTDEVICE_PRESENT S110 NRF51 BLE_DFU_APP_SUPPORT BLE400 SWI_DISABLE0</Define>
+              <Define>BLE_STACK_SUPPORT_REQD SOFTDEVICE_PRESENT S110 NRF51 BLE_DFU_APP_SUPPORT BLE400 SWI_DISABLE0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\config;..\..\..\sdk;..\..\..\tmk_core\common;..\..\ble\;..\..\keyboard\</IncludePath>
             </VariousControls>
